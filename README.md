@@ -1,6 +1,8 @@
 # Company data extactor
 This is a Flask-based web application that provides an API for processing a list of domains and extracting company information. It utilizes Celery for asynchronous task processing, allowing it to handle large volumes of domains efficiently.
 
+![Demo](screenshots/demo.gif)
+
 ## Features
 
 - **Asynchronous Processing**: Domains are processed in batches using Celery tasks, ensuring that the Flask application remains responsive.
