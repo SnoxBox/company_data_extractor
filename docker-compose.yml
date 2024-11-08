@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: redis
+    image: redis # Use the Redis official image
+    ports:
+      - "6379:6379" # Expose Redis port
+    networks:
+      - network
+
+  web:
+    container_name: flask_app
+    build:
+      context: .
+    environment:
+      FLASK_APP: run
+      FLASK_DEBUG: 1
+    command: flask run -h 0.0.0.0 -p 5500 # Use Flask for development mode
+    volumes:
+      - .:/company_data_extractor # Mount the current directory into the container for live code changes
+    ports:
+      - "5500:5500"
+    depends_on:
+      - redis # Wait for Redis to be ready
+      - mariadb # Wait for MariaDB to be ready
+    networks:
+      - network
+
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: .
+    environment:
+      FLASK_APP: app
+    command: celery -A app.celery worker --loglevel=info  # Start the Celery worker
+    volumes:
+      - .:/company_data_extractor
+    depends_on:
+      - redis # Ensure Redis is running before Celery starts
+      - mariadb # Ensure MariaDB is running before Celery starts
+    networks:
+      - network
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: companies
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mount the SQL script here
+    networks:
+      - network
+
+# Create a shared network for all services
+networks:
+  network:
+    driver: bridge
+
+# Create a volume for MariaDB data persistence
+volumes:
+  mariadb_data:

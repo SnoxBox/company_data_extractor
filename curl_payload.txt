@@ -1,0 +1,6 @@
+curl -X POST http://localhost:5500/api/companies/import \-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{
+  "domains": ["mouser.fi"],
+  "batch_size": 5
+}'
