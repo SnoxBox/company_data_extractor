@@ -18,4 +18,4 @@ EXPOSE 5500
 ENV FLASK_APP=app.py
 
 # run the application
-CMD [ "flask", "run", "-h", "localhost", "-p", "5500"]
+CMD [ "flask", "run", "-h", "0.0.0.0", "-p", "5500"]
